@@ -1,0 +1,42 @@
+#!/usr/bin/env php
+<?php
+
+#error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+
+require __DIR__ . "/../vendor/autoload.php";
+
+$dotenv = new Dotenv\Dotenv(__DIR__ . "/..");
+$dotenv->load();
+
+/* Setup Slim */
+$app = new Slim\App();
+
+require __DIR__ . "/../config/logger.php";
+require __DIR__ . "/../config/database.php";
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+$console = new Application();
+
+$console
+    ->register("test")
+    ->setDescription("Used for debugging")
+    ->setCode(function (InputInterface $input, OutputInterface $output) use ($app) {
+        print "Hello world.\n";
+    })
+;
+
+$console
+    ->register("migrate")
+    ->setDescription("Migrate database tables")
+    ->setCode(function (InputInterface $input, OutputInterface $output) use ($app) {
+        print "Migrating database.\n";
+        $app->spot->mapper("App\Example")->migrate();
+    })
+;
+
+$console->run();

@@ -1,0 +1,20 @@
+RewriteEngine On
+
+# Some hosts may require you to use the `RewriteBase` directive.
+# If you need to use the `RewriteBase` directive, it should be the
+# absolute physical path to the directory that contains this htaccess file.
+#
+#RewriteBase /
+
+RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Check for cached image in cache folder.
+#RewriteCond %{REQUEST_METHOD} ^GET$
+#RewriteCond %{DOCUMENT_ROOT}/cache/%{REQUEST_URI} -f
+#RewriteRule ^(.*)$ /cache/$1 [L,QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
+
+# Make sure $HTTP_RAW_POST_DATA is deprecated warning does not appear
+php_value   always_populate_raw_post_data   -1

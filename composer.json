@@ -1,0 +1,27 @@
+{
+    "name": "tuupola/slim-skeleton",
+    "description": "JSON Web Token Authorization Middleware for Slim Framework",
+    "type": "project",
+    "keywords": [
+        "slim",
+        "skeleton"
+    ],
+    "homepage": "https://github.com/tuupola/slim-skeleton",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mika Tuupola",
+            "email": "tuupola@appelsiini.net",
+            "homepage": "http://www.appelsiini.net/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "slim/slim": "@rc",
+        "monolog/monolog": "^1.17",
+        "vlucas/phpdotenv": "^2.0",
+        "symfony/console": "^2.7",
+        "vlucas/spot2": "^2.1",
+        "league/plates": "^3.1"
+    }
+}
