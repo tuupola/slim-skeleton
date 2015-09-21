@@ -1,6 +1,6 @@
 {
     "name": "tuupola/slim-skeleton",
-    "description": "JSON Web Token Authorization Middleware for Slim Framework",
+    "description": "Slim 3 + Datamapper + Monolog + Plates project",
     "type": "project",
     "keywords": [
         "slim",
