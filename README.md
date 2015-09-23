@@ -1,11 +1,10 @@
-# JWT Authentication Middleware for Slim
+# Slim 3 skeleton
 
 [![Latest Version](https://img.shields.io/packagist/v/tuupola/slim-skeleton.svg?style=flat-square)](https://github.com/tuupola/slim-skeleton/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
 This is Slim 3 skeleton project form Composer. Project includes [Spot2](http://phpdatamapper.com/), [Monolog](https://github.com/Seldaek/monolog), [Plates](http://platesphp.com/) libraries and [Vagrant](https://www.vagrantup.com/) virtualmachine config.
 
-+ Datamapper + Monolog + Plates project for Composer
 ## Install
 
 Install the latest version using [composer](https://getcomposer.org/).
