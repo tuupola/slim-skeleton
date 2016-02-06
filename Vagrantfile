@@ -56,7 +56,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #SHELL
 
   # Update Apache config and restart
-  config.vm.provision "shell", name: "apache", inline: <<-SHELL
+  config.vm.provision "shell", name: "apache", inline: <<-'SHELL'
     sed -i -e "s/DocumentRoot \"\/var\/www\/html\"/DocumentRoot \/vagrant\/public/" /etc/httpd/conf/httpd.conf
     # If you prefer Slim app to be in subfolder comment above and uncomment below
     #echo "Alias /foobar/ /vagrant/public/" >> /etc/httpd/conf/httpd.conf
@@ -81,11 +81,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   SHELL
 
   # Install Grunt and npm dependencies
-  config.vm.provision "shell", name: "grunt", inline: <<-SHELL
-    yum -y install npm
-    npm install -g grunt-cli
-    cd /vagrant && npm install
-  SHELL
+  #config.vm.provision "shell", name: "grunt", inline: <<-SHELL
+  #  yum -y install npm
+  #  npm install -g grunt-cli
+  #  cd /vagrant && npm install
+  #SHELL
 
   config.vm.post_up_message = <<MESSAGE
 
