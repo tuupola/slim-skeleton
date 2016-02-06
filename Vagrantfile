@@ -1,3 +1,4 @@
+# Fix permissions after you run commands on both hosts and guest machine
 system("
     if [ #{ARGV[0]} = 'up' ]; then
         echo 'Setting world write permissions for ./logs/*'
@@ -19,88 +20,74 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.synced_folder "public/downloads", "/vagrant/public/downloads", owner: 48, group: 48
 
   # Install all needed packages
-  config.vm.provision :shell, inline: "rpm -Uvh https://mirror.webtatic.com/yum/el6/latest.rpm"
-  config.vm.provision :shell, inline: "rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm"
+  config.vm.provision "shell", name: "rpm", inline: <<-SHELL
+    rpm -Uvh https://mirror.webtatic.com/yum/el6/latest.rpm
+    rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+  SHELL
 
-  # Do not update for now because it breaks VBoxAdditions If you run this you need to
-  # run $ /etc/init.d/vboxadd setup manually.
-  #config.vm.provision :shell, inline: "yum -y update"
+  # PHP and modules
+  config.vm.provision "shell", name: "php", inline: <<-SHELL
+    yum -y install php56w php56w-opcache
+    yum -y install php56w-pdo
+    yum -y install php56w-mcrypt
+    #yum -y install php56w-mysqlnd
+    #yum -y install php56w-soap
+    #yum -y install php56w-mbstring
+    #yum -y install php56w-xml
+    # Uncomment if you want code coverage. Makes tests really slow.
+    #yum -y install php56w-pecl-xdebug
+    yum -y install mod_ssl
+  SHELL
 
-  # Make sure VBoxAdditions work after yum update
-  #config.vm.provision :shell, inline: "/etc/init.d/vboxadd setup"
+  # Uncomment to install basic tools
+  #config.vm.provision "shell", name: "tools", inline: <<-SHELL
+  #  yum -y install zsh
+  #  yum -y install finger
+  #  yum -y install telnet
+  #  yum -y install screen
+  #SHELL
 
-  # Continue with packages
-  config.vm.provision :shell, inline: "yum -y install php56w php56w-opcache"
-  config.vm.provision :shell, inline: "yum -y install php56w-pdo"
-  config.vm.provision :shell, inline: "yum -y install php56w-mysqlnd"
-  config.vm.provision :shell, inline: "yum -y install php56w-soap"
-  config.vm.provision :shell, inline: "yum -y install php56w-mcrypt"
-  config.vm.provision :shell, inline: "yum -y install php56w-mbstring"
-  config.vm.provision :shell, inline: "yum -y install php56w-xml"
-  # Enable if you want code coverage. Makes tests really slow.
-  #config.vm.provision :shell, inline: "yum -y install php56w-pecl-xdebug"
-  config.vm.provision :shell, inline: "yum -y install mod_ssl"
+  # Uncomment to install MySQL
+  #config.vm.provision "shell", name: "mysql", inline: <<-SHELL
+  #  yum -y install mysql
+  #  yum -y install mysql-server
+  #  /etc/init.d/mysqld restart
+  #  /sbin/chkconfig --levels 235 mysqld on
+  #SHELL
 
-  # Install basic tools
-  config.vm.provision :shell, inline: "yum -y install zsh"
-  config.vm.provision :shell, inline: "yum -y install finger"
-  config.vm.provision :shell, inline: "yum -y install telnet"
-  config.vm.provision :shell, inline: "yum -y install screen"
-  config.vm.provision :shell, inline: "yum -y install autossh"
+  # Update Apache config and restart
+  config.vm.provision "shell", name: "apache", inline: <<-SHELL
+    sed -i -e "s/DocumentRoot \"\/var\/www\/html\"/DocumentRoot \/vagrant\/public/" /etc/httpd/conf/httpd.conf
+    # If you prefer Slim app to be in subfolder comment above and uncomment below
+    #echo "Alias /foobar/ /vagrant/public/" >> /etc/httpd/conf/httpd.conf
+    echo "EnableSendfile off" >> /etc/httpd/conf/httpd.conf
+    sed -i -e "s/ErrorLog logs\/error_log/ErrorLog \/vagrant\/logs\/error_log/" /etc/httpd/conf/httpd.conf
+    sed -i -e "s/CustomLog logs\/access_log/CustomLog \/vagrant\/logs\/access_log/" /etc/httpd/conf/httpd.conf
+    sed -i -e "s/AllowOverride None/AllowOverride All/" /etc/httpd/conf/httpd.conf
 
-  # Install node and npm so we can use later Grunt
-  config.vm.provision :shell, inline: "yum -y install npm"
+    /etc/init.d/httpd restart
+    /sbin/chkconfig --levels 235 httpd on
 
-  # Install MySQL server
-  config.vm.provision :shell, inline: "yum -y install mysql"
-  config.vm.provision :shell, inline: "yum -y install mysql-server"
-  config.vm.provision :shell, inline: "/etc/init.d/mysqld restart"
-  config.vm.provision :shell, inline: "/sbin/chkconfig --levels 235 mysqld on"
-
-  # Stop iptables because it is not really needed on development environment
-  config.vm.provision :shell, inline: "/etc/init.d/iptables stop"
-  config.vm.provision :shell, inline: "/sbin/chkconfig iptables off"
-
-  # Update Apache config
-  # Make /vagrant/public as document root
-  config.vm.provision :shell, inline: 'sed -i -e "s/DocumentRoot \"\/var\/www\/html\"/DocumentRoot \/vagrant\/public/" /etc/httpd/conf/httpd.conf'
-  # Or alternatively use directory alias instead of document root.
-  #config.vm.provision :shell, inline: 'echo "Alias /api/ /vagrant/public/" >> /etc/httpd/conf/httpd.conf'
-  config.vm.provision :shell, inline: 'echo "EnableSendfile off" >> /etc/httpd/conf/httpd.conf'
-  config.vm.provision :shell, inline: 'sed -i -e "s/ErrorLog logs\/error_log/ErrorLog \/vagrant\/logs\/error_log/" /etc/httpd/conf/httpd.conf'
-  config.vm.provision :shell, inline: 'sed -i -e "s/CustomLog logs\/access_log/CustomLog \/vagrant\/logs\/access_log/" /etc/httpd/conf/httpd.conf'
-  config.vm.provision :shell, inline: 'sed -i -e "s/AllowOverride None/AllowOverride All/" /etc/httpd/conf/httpd.conf'
-
-  # Restart Apache for first time
-  config.vm.provision :shell, inline: "/etc/init.d/httpd restart"
-  config.vm.provision :shell, inline: "/sbin/chkconfig --levels 235 httpd on"
-
-  # Make sure Apache also runs after vagrant reload
-  $upstart = <<UPSTART
-echo "
-# Start Apache after /vagrant is mounted
-start on vagrant-mounted
-exec /etc/init.d/httpd restart
-" > /etc/init/httpd.conf
-UPSTART
-  config.vm.provision :shell, inline: $upstart
+    # Make sure Apache also runs after vagrant reload
+    echo "# Start Apache after /vagrant is mounted" > /etc/init/httpd.conf
+    echo "start on vagrant-mounted" >> /etc/init/httpd.conf
+    echo "exec /etc/init.d/httpd restart" >> /etc/init/httpd.conf
+  SHELL
 
   # Install Composer and dependencies
-  config.vm.provision :shell, inline: "curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer"
-  config.vm.provision :shell, inline: "cd /vagrant && /usr/local/bin/composer install"
+  config.vm.provision "shell", name: "composer", inline: <<-SHELL
+    curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
+    cd /vagrant && /usr/local/bin/composer install
+  SHELL
 
   # Install Grunt and npm dependencies
-  config.vm.provision :shell, inline: "npm install -g grunt-cli"
-  #config.vm.provision :shell, inline: "cd /vagrant && npm install"
+  config.vm.provision "shell", name: "grunt", inline: <<-SHELL
+    yum -y install npm
+    npm install -g grunt-cli
+    cd /vagrant && npm install
+  SHELL
 
-  # Create environent file
-  config.vm.provision :shell, inline: "cd /vagrant && cp .env.example .env"
-
-  # Create and migrate database
-  config.vm.provision :shell, inline: 'echo "CREATE DATABASE example;" | mysql -u root'
-  #config.vm.provision :shell, inline: "cd /vagrant && bin/db migrate"
-
-  $message = <<MESSAGE
+  config.vm.post_up_message = <<MESSAGE
 
   ███████╗██╗     ██╗███╗   ███╗██████╗
   ██╔════╝██║     ██║████╗ ████║╚════██╗
@@ -113,5 +100,4 @@ UPSTART
 
 MESSAGE
 
-  config.vm.post_up_message = $message
 end
