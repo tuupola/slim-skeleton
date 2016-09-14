@@ -74,6 +74,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     echo "exec /etc/init.d/httpd restart" >> /etc/init/httpd.conf
   SHELL
 
+  # Stop iptables because it causes too much confusion
+  config.vm.provision "shell", name: "iptables", inline: <<-SHELL
+    /etc/init.d/iptables stop
+    /sbin/chkconfig iptables off
+  SHELL
+
   # Install Composer and dependencies
   config.vm.provision "shell", name: "composer", inline: <<-SHELL
     curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
