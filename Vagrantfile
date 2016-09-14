@@ -80,6 +80,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     cd /vagrant && /usr/local/bin/composer install
   SHELL
 
+  # Use the provided example environment
+  config.vm.provision "shell", name: "environment", inline: <<-SHELL
+    cd /vagrant && cp .env.example .env
+  SHELL
+
   # Install Grunt and npm dependencies
   #config.vm.provision "shell", name: "grunt", inline: <<-SHELL
   #  yum -y install npm
