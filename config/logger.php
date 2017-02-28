@@ -8,7 +8,7 @@ use Monolog\Formatter\LineFormatter;
 
 $container = $app->getContainer();
 
-$container["logger"] = function ($c) {
+$container["logger"] = function ($container) {
     $logger = new Logger("slim");
 
     $formatter = new LineFormatter(
