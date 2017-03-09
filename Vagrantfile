@@ -33,7 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     #yum -y install php56w-mysqlnd
     #yum -y install php56w-soap
     #yum -y install php56w-mbstring
-    #yum -y install php56w-xml
+    yum -y install php56w-xml
     # Uncomment if you want code coverage. Makes tests really slow.
     #yum -y install php56w-pecl-xdebug
     yum -y install mod_ssl
