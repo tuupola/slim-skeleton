@@ -7,9 +7,8 @@ $dotenv->load();
 
 $app = new Slim\App;
 
-require __DIR__ . "/config/logger.php";
-require __DIR__ . "/config/view.php";
-#require __DIR__ . "/config/database.php";
+require __DIR__ . "/config/dependencies.php";
+require __DIR__ . "/config/middleware.php";
 
 $app->get("/", function ($request, $response, $arguments) {
     return $response->write($this->view->render("index"));
