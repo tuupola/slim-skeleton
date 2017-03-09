@@ -22,7 +22,8 @@
         "vlucas/phpdotenv": "^2.0",
         "symfony/console": "^2.7",
         "vlucas/spot2": "^2.1",
-        "league/plates": "^3.1"
+        "league/plates": "^3.1",
+        "tuupola/dbal-psr3-logger": "^0.1.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.8",

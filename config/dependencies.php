@@ -53,6 +53,9 @@ $container["spot"] = function ($container) {
 
     $spot = new \Spot\Locator($config);
 
+    $sqllogger = new Tuupola\DBAL\Logging\Psr3Logger($container["logger"]);
+    $mysql->getConfiguration()->setSQLLogger($sqllogger);
+
     return $spot;
 };
 
