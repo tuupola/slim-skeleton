@@ -32,13 +32,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     yum -y install php56w php56w-opcache
     yum -y install php56w-pdo
     yum -y install php56w-mcrypt
-    #yum -y install php56w-mysqlnd
-    #yum -y install php56w-soap
+    yum -y install php56w-mysqlnd
     #yum -y install php56w-mbstring
     yum -y install php56w-xml
     # Uncomment if you want code coverage. Makes tests really slow.
     #yum -y install php56w-pecl-xdebug
     yum -y install mod_ssl
+  SHELL
+
+  # Use the provided example environment
+  config.vm.provision "shell", name: "environment", inline: <<-SHELL
+    cd /vagrant && cp .env.example .env
   SHELL
 
   # Uncomment to install basic tools
@@ -49,13 +53,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #  yum -y install screen
   #SHELL
 
-  # Uncomment to install MySQL
-  #config.vm.provision "shell", name: "mysql", inline: <<-SHELL
-  #  yum -y install mysql
-  #  yum -y install mysql-server
-  #  /etc/init.d/mysqld restart
-  #  /sbin/chkconfig --levels 235 mysqld on
-  #SHELL
+  # MariaDB
+  config.vm.provision "shell", name: "mariadb", inline: <<-SHELL
+  cat <<EOF | sudo tee /etc/yum.repos.d/influxdb.repo
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.0/centos6-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+EOF
+    yum -y install MariaDB-server
+    yum -y install MariaDB-client
+    /sbin/service/service mysql start
+    /sbin/chkconfig –levels 235 mysql on
+    echo "CREATE DATABASE example" | mysql -u root
+    cd /vagrant && bin/db migrate
+  SHELL
 
   # Update Apache config and restart
   config.vm.provision "shell", name: "apache", inline: <<-'SHELL'
@@ -89,11 +102,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", name: "composer", inline: <<-SHELL
     curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
     cd /vagrant && /usr/local/bin/composer install
-  SHELL
-
-  # Use the provided example environment
-  config.vm.provision "shell", name: "environment", inline: <<-SHELL
-    cd /vagrant && cp .env.example .env
   SHELL
 
   config.vm.post_up_message = <<MESSAGE
