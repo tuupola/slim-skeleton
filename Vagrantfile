@@ -64,8 +64,8 @@ gpgcheck=1
 EOF
     yum -y install MariaDB-server
     yum -y install MariaDB-client
-    /sbin/service/service mysql start
-    /sbin/chkconfig –levels 235 mysql on
+    /sbin/service mysql start
+    /sbin/chkconfig --levels 235 mysql on
     echo "CREATE DATABASE example" | mysql -u root
     cd /vagrant && bin/db migrate
   SHELL
