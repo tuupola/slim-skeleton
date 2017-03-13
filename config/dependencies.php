@@ -63,10 +63,3 @@ $container["spot"] = function ($container) {
 $container["view"] = function ($c) {
     return new \League\Plates\Engine(__DIR__ . "/../views", "html");
 };
-
-/* Setup Spot */
-/* Log SQL queries. Make sure logger is configured. */
-/*
-$logger = new Doctrine\DBAL\Logging\MonologSQLLogger(Monolog\Registry::sql());
-$mysql->getConfiguration()->setSQLLogger($logger);
-*/
