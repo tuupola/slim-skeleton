@@ -1,8 +1,8 @@
 # Fix permissions after you run commands on both hosts and guest machine
 if !Vagrant::Util::Platform.windows?
   system("
-      if [ #{ARGV[0]} = "up"" ]; then
-          echo "Setting group write permissions for ./logs/*""
+      if [ #{ARGV[0]} = 'up' ]; then
+          echo 'Setting group write permissions for ./logs/*'
           chmod 775 ./logs
           chmod 664 ./logs/*
       fi
@@ -23,20 +23,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Install all needed packages
   config.vm.provision "shell", name: "rpm", inline: <<-SHELL
+    rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
     rpm -Uvh https://mirror.webtatic.com/yum/el6/latest.rpm
-    rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
   SHELL
 
   # PHP and modules
   config.vm.provision "shell", name: "php", inline: <<-SHELL
-    yum -y install php56w php56w-opcache
-    yum -y install php56w-pdo
-    yum -y install php56w-mcrypt
-    yum -y install php56w-mysqlnd
-    #yum -y install php56w-mbstring
-    yum -y install php56w-xml
-    # Uncomment if you want code coverage. Makes tests really slow.
-    #yum -y install php56w-pecl-xdebug
+    yum -y install mod_php71w php71w-opcache
+    yum -y install php71w-cli
+    yum -y install php71w-common
+    yum -y install php71w-mysqlnd
+    yum -y install php71w-pdo
+    yum -y install php71w-xml
     yum -y install mod_ssl
   SHELL
 
