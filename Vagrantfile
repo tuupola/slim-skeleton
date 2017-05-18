@@ -1,10 +1,10 @@
 # Fix permissions after you run commands on both hosts and guest machine
 if !Vagrant::Util::Platform.windows?
   system("
-      if [ #{ARGV[0]} = 'up' ]; then
-          echo 'Setting world write permissions for ./logs/*'
-          chmod a+w ./logs
-          chmod a+w ./logs/*
+      if [ #{ARGV[0]} = "up"" ]; then
+          echo "Setting group write permissions for ./logs/*""
+          chmod 775 ./logs
+          chmod 664 ./logs/*
       fi
   ")
 end
@@ -15,8 +15,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "puppetlabs/centos-6.6-64-nocm"
   config.vm.network "private_network", ip: "192.168.50.50"
 
-  # Make sure logs folder will be writable for Apache
-  config.vm.synced_folder "logs", "/vagrant/logs", owner: 48, group: 48
+  # Make sure logs folder will be writable for Vagrant and Apache
+  config.vm.synced_folder "logs", "/vagrant/logs", owner: 500, group: 48
 
   # Make sure downloads folder will be writable for Apache
   #config.vm.synced_folder "public/downloads", "/vagrant/public/downloads", owner: 48, group: 48
