@@ -24,7 +24,7 @@
         "vlucas/spot2": "^2.1",
         "league/plates": "^3.1",
         "tuupola/dbal-psr3-logger": "^0.1.0",
-        "tuupola/base62": "^0.8.0"
+        "tuupola/base62": "1.0.0-rc1"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.8",
